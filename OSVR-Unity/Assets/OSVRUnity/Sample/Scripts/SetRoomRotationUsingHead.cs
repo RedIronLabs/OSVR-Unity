@@ -19,17 +19,20 @@
 /// </copyright>
 
 using UnityEngine;
-using System.Collections;
 
 namespace OSVR
 {
     namespace Unity
     {
-
+        /// <summary>
+        /// Allows clearing or resetting the view based in relation to the HMD rotation
+        /// </summary>
         public class SetRoomRotationUsingHead : MonoBehaviour
         {
             public KeyCode setRoomRotationKey = KeyCode.R;
             public KeyCode clearRoomRotationKey = KeyCode.U;
+            public bool recenterOnPlay = true; 
+
             private ClientKit _clientKit;
             private DisplayController _displayController;
 
@@ -37,34 +40,40 @@ namespace OSVR
             {
                 _clientKit = ClientKit.instance;
                 _displayController = FindObjectOfType<DisplayController>();
+
+                if (recenterOnPlay)
+                    SetRoomRotation();
             }
 
-            void FixedUpdate()
+            void Update()
             {
                 if (Input.GetKeyDown(setRoomRotationKey))
-                {                   
-                    
-                    if (_displayController != null && _displayController.UseRenderManager)
-                    {
-                        _displayController.RenderManager.SetRoomRotationUsingHead();
-                    }
-                    else
-                    {
-                        _clientKit.context.SetRoomRotationUsingHead();
-                    }
-                }
-                if (Input.GetKeyDown(clearRoomRotationKey))
-                {
-                    if (_displayController != null && _displayController.UseRenderManager)
-                    {
-                        _displayController.RenderManager.ClearRoomToWorldTransform();
-                    }
-                    else
-                    {
-                        _clientKit.context.ClearRoomToWorldTransform();
-                    }
+                    SetRoomRotation();
 
-                }
+                if (Input.GetKeyDown(clearRoomRotationKey))
+                    ClearRoomTransform();
+            }
+
+            /// <summary>
+            /// Clears the offset below, mirroring the real-world geo rotation of the camera to the scene view
+            /// </summary>
+            private void ClearRoomTransform()
+            {
+                if (_displayController != null && _displayController.UseRenderManager)
+                    _displayController.RenderManager.ClearRoomToWorldTransform();
+                else
+                    _clientKit.context.ClearRoomToWorldTransform();
+            }
+
+            /// <summary>
+            /// Essentially clears the rotation of the view, essentially setting the 3D View's "forward" view to 0,0,0
+            /// </summary>
+            private void SetRoomRotation()
+            {
+                if (_displayController != null && _displayController.UseRenderManager)
+                    _displayController.RenderManager.SetRoomRotationUsingHead();
+                else
+                    _clientKit.context.SetRoomRotationUsingHead();
             }
         }
     }
