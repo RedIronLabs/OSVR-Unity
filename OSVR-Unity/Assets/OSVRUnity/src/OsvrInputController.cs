@@ -22,13 +22,11 @@
 /// The class name has been changed to avoid naming conflict and confusion.
 
 using UnityEngine;
-using System.Collections;
-
 namespace OSVR
 {
     namespace Unity
     {
-        // Require a character controller to be attached to the same game object
+        [RequireComponent (typeof(OsvrCharacterMotor))]
         public class OsvrInputController : MonoBehaviour
         {
             private OsvrCharacterMotor motor;
